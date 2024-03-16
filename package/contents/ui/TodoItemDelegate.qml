@@ -1,9 +1,12 @@
-import QtQuick 2.0
-import QtQuick.Controls 2.3 as QQC2
-import QtQuick.Layouts 1.1
-import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.plasma.components 3.0 as PlasmaComponents3
-import org.kde.draganddrop 2.0 as DragAndDrop
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import QtQuick.Dialogs  // MessageDialog
+import org.kde.plasma.components as PlasmaComponents3
+import org.kde.draganddrop as DragAndDrop
+import org.kde.ksvg as KSvg
+
+import org.kde.kirigami as Kirigami
 
 MouseArea {
 	id: todoItemDelegate
@@ -53,7 +56,7 @@ MouseArea {
 		z: -1
 		// anchors.margins: 10
 
-		onEntered: {
+		onEntered: drag => {
 			if (drag.source.dragItemModel) {
 				if (todoModel == drag.source.dragItemModel) {
 					todoModel.move(drag.source.dragItemIndex, index, 1)
@@ -102,30 +105,28 @@ MouseArea {
 			property var dragItemDelegate: todoItemDelegate
 			property var dragItemModel: todoModel
 			property int dragItemIndex: index
+
 			DragAndDrop.DragArea {
 				id: dragArea
 				anchors.fill: parent
 				delegate: todoItemRow
 			}
 
-			PlasmaCore.FrameSvgItem {
+			KSvg.FrameSvgItem {
 				visible: todoItemDelegate.containsMouse && !dropArea.containsDrag
 				anchors.horizontalCenter: parent.horizontalCenter
 				anchors.top: parent.top
-				anchors.bottom: parent.bottom
-				width: parent.width / 2
-				imagePath: plasmoid.file("", "images/dragarea.svg")
+				height: Math.min(parent.height, checkbox.implicitHeight * 2)
+				width: Kirigami.Units.iconSizes.small
+				imagePath: Qt.resolvedUrl("../images/dragarea.svg")
 			}
 		}
 
 		PlasmaComponents3.CheckBox {
 			id: checkbox
+			topPadding: Kirigami.Units.mediumSpacing
 			Layout.alignment: Qt.AlignTop
-			property int size: 30 * units.devicePixelRatio
-			Layout.minimumWidth: size
-			Layout.minimumHeight: size
 			checked: todoItemDelegate.isCompleted
-
 			onClicked: setComplete(checked)
 		}
 
@@ -198,14 +199,14 @@ MouseArea {
 				out = out.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
 					return '&#' + i.charCodeAt(0) + ';'
 				})
-				
+
 				// Render links
 				var rUrl = /(http|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/gi
 				out = out.replace(rUrl, function(m) {
 					return '<a href="' + m + '">' + m + '</a>' + ' ' // Extra space to prevent styling entire text as a link when ending with a link.
 				})
 				// Define before anchor tags.
-				out = '<style>a { color: ' + theme.highlightColor + '; }</style>' + out
+				out = '<style>a { color: ' + Kirigami.Theme.highlightColor + '; }</style>' + out
 
 				// Render new lines
 				out = out.replace(/\n/g, '<br>')
@@ -218,7 +219,7 @@ MouseArea {
 			readonly property bool shouldFade: !isEditing && todoItemDelegate.isCompleted && plasmoid.configuration.fadeCompleted
 			opacity: shouldFade ? 0.6 : 1
 
-			Keys.onPressed: {
+			Keys.onPressed: event => {
 				if (event.key == Qt.Key_Tab) {
 					setIndent(model.indent + 1)
 					event.accepted = true
@@ -256,13 +257,37 @@ MouseArea {
 			id: removeButton
 			Layout.alignment: Qt.AlignTop
 			visible: !plasmoid.configuration.deleteOnComplete
-			Layout.preferredWidth: checkbox.implicitHeight
-			Layout.preferredHeight: checkbox.implicitHeight
-			icon.name: 'trash-empty'
+			icon.name: 'delete'
 			opacity: textArea.activeFocus || hovered ? 1 : 0
+			onClicked: promptDeleteLoader.show()
+			Loader {
+				id: promptDeleteLoader
+				active: false
 
-			onClicked: {
-				deleteItem()
+				function show() {
+					if (item) {
+						item.visible = true
+					} else {
+						active = true
+					}
+				}
+
+				sourceComponent: Component {
+					MessageDialog {
+						visible: true
+						title: i18n("Delete Item")
+						text: i18n("Are you sure you want to delete the item?")
+						buttons: MessageDialog.Ok | MessageDialog.Cancel
+						onButtonClicked: function (button, role) {
+							switch (button) {
+							case MessageDialog.Ok:
+								deleteItem()
+								break;
+							}
+						}
+						Component.onCompleted: visible = true
+					}
+				}
 			}
 		}
 	}

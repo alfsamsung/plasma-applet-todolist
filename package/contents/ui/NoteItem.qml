@@ -1,6 +1,6 @@
-import QtQuick 2.0
+import QtQuick
 
-import org.kde.plasma.private.notes 0.1 as NotesWidget
+import org.kde.plasma.private.notes as NotesWidget
 
 Item {
 	id: noteItem
@@ -12,7 +12,7 @@ Item {
 		} else if (plasmoid.configuration.noteFilename) {
 			return plasmoid.configuration.noteFilename
 		} else { // instanceNoteId
-			return 'todolist_' + plasmoid.id
+			return 'todolist_' + Plasmoid.id
 		}
 	}
 	onNoteIdChanged: {
@@ -30,7 +30,7 @@ Item {
 	property string noteText: ''
 	Connections {
 		target: note
-		onNoteTextChanged: {
+		function onNoteTextChanged() {
 			// console.log('note.onNoteTextChanged', note.noteText.length)
 			// if (note.noteText != noteText) {
 				noteItem.noteText = note.noteText
@@ -345,7 +345,9 @@ Item {
 
 	Connections {
 		target: plasmoid.configuration
-		onShowCompletedItemsChanged: todoModel.updateVisibleItems()
+		function onShowCompletedItemsChanged() {
+			todoModel.updateVisibleItems()
+		}
 	}
 
 	Component.onCompleted: {
