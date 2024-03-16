@@ -1,0 +1,19 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Name": "TodoList",
+        "Id": "com.github.zren.todolist",
+        "Description": "Todo list",
+        "Category": "Utilities",
+        "Icon": "view-list-symbolic",
+        "Authors": [
+            {
+                "Email": "zrenfire@gmail.com",
+                "Name": "Chris Holland"
+            }
+        ],
+        "Version": "14.1",
+        "Website": "https://github.com/Zren/plasma-applet-todolist"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

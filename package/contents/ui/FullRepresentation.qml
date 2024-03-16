@@ -1,17 +1,17 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.1
-import QtQuick.Layouts 1.1
-import QtQuick.Window 2.2
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import QtQuick.Window
 
-import org.kde.plasma.core 2.0 as PlasmaCore
+import org.kde.kirigami as Kirigami
 import org.kde.plasma.components 3.0 as PlasmaComponents3
 
 FocusScope {
 	id: fullRepresentation
-	Layout.minimumWidth: units.gridUnit * 10 * noteItem.numSections
-	Layout.minimumHeight: units.gridUnit * 10
-	Layout.preferredWidth: units.gridUnit * 20 * noteItem.numSections
-	Layout.preferredHeight: Math.min(Math.max(units.gridUnit * 20, maxContentHeight), Screen.desktopAvailableHeight) // Binding loop warning (meh).
+	Layout.minimumWidth: Kirigami.Units.gridUnit * 10 * noteItem.numSections
+	Layout.minimumHeight: Kirigami.Units.gridUnit * 10
+	Layout.preferredWidth: Kirigami.Units.gridUnit * 20 * noteItem.numSections
+	Layout.preferredHeight: Math.min(Math.max(Kirigami.Units.gridUnit * 20, maxContentHeight), Screen.desktopAvailableHeight) // Binding loop warning (meh).
 	property int maxContentHeight: 0
 	function updateMaxContentHeight() {
 		var maxHeight = 0
@@ -27,9 +27,6 @@ FocusScope {
 		// console.log('maxContentHeight', maxHeight)
 		maxContentHeight = maxHeight
 	}
-	// property int contentHeight: pinButton.height + container.spacing + listView.contentHeight
-	// Layout.maximumWidth: plasmoid.screenGeometry.width
-	// Layout.maximumHeight: plasmoid.screenGeometry.height
 
 	property bool isDesktopContainment: false
 
@@ -64,11 +61,11 @@ FocusScope {
 		id: pinButton
 		anchors.top: parent.top
 		anchors.right: parent.right
-		width: Math.round(units.gridUnit * 1.25)
+		width: Math.round(Kirigami.Units.gridUnit * 1.25)
 		height: width
 		checkable: true
 		icon.name: "window-pin"
-		onCheckedChanged: plasmoid.hideOnWindowDeactivate = !checked
+		onCheckedChanged: Plasmoid.hideOnWindowDeactivate = !checked
 		visible: !isDesktopContainment
 	}
 }

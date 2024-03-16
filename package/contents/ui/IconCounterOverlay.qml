@@ -20,16 +20,17 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .        *
  ***************************************************************************/
 
-import QtQuick 2.4
+import QtQuick
 
-import org.kde.plasma.components 3.0 as PlasmaComponents3
+import org.kde.plasma.components as PlasmaComponents3
+import org.kde.kirigami as Kirigami
 
 Item {
 	id: overlay
 	readonly property int iconWidthDelta: (icon.width - icon.paintedWidth) / 2
 	property alias text: badgeLabel.text
-	property color backgroundColor: plasmoid.configuration.roundCounter ? theme.highlightColor : theme.backgroundColor
-	property color textColor: plasmoid.configuration.roundCounter ? theme.backgroundColor : theme.highlightColor
+	property color backgroundColor: plasmoid.configuration.roundCounter ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+	property color textColor: plasmoid.configuration.roundCounter ? Kirigami.Theme.backgroundColor : Kirigami.Theme.highlightColor
 	property real heightRatio: plasmoid.configuration.bigCounter ? 1.0 : 0.4
 
 	Item {
@@ -37,42 +38,43 @@ Item {
 		anchors.fill: parent
 
 		Rectangle {
-			readonly property int offset: Math.round(Math.max(units.smallSpacing / 2, badgeMask.width / 32))
+			readonly property int offset: Math.round(Math.max(Kirigami.Units.smallSpacing / 2, badgeMask.width / 32))
 			x: Qt.application.layoutDirection === Qt.RightToLeft ? -offset + iconWidthDelta : parent.width - width + offset - iconWidthDelta
 			y: -offset
 			width: badgeRect.width + offset * 2
 			height: badgeRect.height + offset * 2
 			radius: plasmoid.configuration.roundCounter ? width : 0
+			color: overlay.backgroundColor
 		}
 	}
 
-	ShaderEffect {
-		anchors.fill: parent
-		property var source: ShaderEffectSource {
-			sourceItem: icon
-			hideSource: overlay.visible
-		}
-		property var mask: ShaderEffectSource {
-			sourceItem: badgeMask
-			hideSource: true
-			live: false
-		}
-
-		onWidthChanged: mask.scheduleUpdate()
-		onHeightChanged: mask.scheduleUpdate()
-
-		supportsAtlasTextures: true
-
-		fragmentShader: "
-			varying highp vec2 qt_TexCoord0;
-			uniform highp float qt_Opacity;
-			uniform lowp sampler2D source;
-			uniform lowp sampler2D mask;
-			void main() {
-				gl_FragColor = texture2D(source, qt_TexCoord0.st) * (1.0 - (texture2D(mask, qt_TexCoord0.st).a)) * qt_Opacity;
-			}
-		"
-	}
+	// ShaderEffect {
+	// 	anchors.fill: parent
+	// 	property var source: ShaderEffectSource {
+	// 		sourceItem: icon
+	// 		hideSource: overlay.visible
+	// 	}
+	// 	property var mask: ShaderEffectSource {
+	// 		sourceItem: badgeMask
+	// 		hideSource: true
+	// 		live: false
+	// 	}
+ //
+	// 	onWidthChanged: mask.scheduleUpdate()
+	// 	onHeightChanged: mask.scheduleUpdate()
+ //
+	// 	supportsAtlasTextures: true
+ //
+	// 	fragmentShader: "
+	// 		varying highp vec2 qt_TexCoord0;
+	// 		uniform highp float qt_Opacity;
+	// 		uniform lowp sampler2D source;
+	// 		uniform lowp sampler2D mask;
+	// 		void main() {
+	// 			gl_FragColor = texture2D(source, qt_TexCoord0.st) * (1.0 - (texture2D(mask, qt_TexCoord0.st).a)) * qt_Opacity;
+	// 		}
+	// 	"
+	// }
 
 	Rectangle {
 		id: badgeRect
