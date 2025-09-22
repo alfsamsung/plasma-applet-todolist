@@ -1,5 +1,6 @@
 import QtQuick
 
+import org.kde.plasma.plasmoid
 import org.kde.plasma.private.notes as NotesWidget
 
 Item {
@@ -18,13 +19,13 @@ Item {
 	onNoteIdChanged: {
 		// console.log('[todolist] onNoteIdChanged', noteId)
 		if (!noteItem.note || noteItem.note.id != noteId) {
-			noteItem.note = noteManager.loadNote(noteId)
+			noteItem.note = noteManager.loadNote(noteId, Plasmoid.id)
 		}
 		plasmoid.configuration.noteId = noteId
 	}
 
 	NotesWidget.NoteManager { id: noteManager }
-	property QtObject note: noteManager.loadNote(noteId)
+	property QtObject note: noteManager.loadNote(noteId, Plasmoid.id)
 	property bool deserializeOnFileChange: true
 	property bool saveOnChange: true
 	property string noteText: ''
