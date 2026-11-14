@@ -122,10 +122,24 @@ MouseArea {
 			}
 		}
 
+		// Height of a one-line TextArea, so the checkbox centers on the
+		// first line of the item instead of riding above it.
+		FontMetrics {
+			id: lineMetrics
+			font: textArea.font
+		}
+
 		PlasmaComponents3.CheckBox {
 			id: checkbox
-			topPadding: Kirigami.Units.mediumSpacing
+			// Reserve the indicator's full size in the row (plus a gap) so the
+			// TextArea's background can't overlap and clip it.
+			padding: 0
 			Layout.alignment: Qt.AlignTop
+			Layout.preferredWidth: indicator.implicitWidth
+			Layout.preferredHeight: Math.max(indicator.implicitHeight,
+				textArea.topPadding + textArea.bottomPadding + lineMetrics.height)
+			Layout.rightMargin: Kirigami.Units.smallSpacing
+			z: 1
 			checked: todoItemDelegate.isCompleted
 			onClicked: setComplete(checked)
 		}
