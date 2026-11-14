@@ -11,6 +11,11 @@ PlasmoidItem {
 	NoteItem {
 		id: noteItem
 	}
+	onExpandedChanged: function(isExpanded) {
+		if (isExpanded) {
+			noteItem.reloadFromDisk()
+		}
+	}
 
 	Plasmoid.icon: plasmoid.configuration.icon
 
