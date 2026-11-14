@@ -1,7 +1,6 @@
 import QtQuick
 
 import org.kde.plasma.plasmoid
-import org.kde.plasma.private.notes as NotesWidget
 
 Item {
 	id: noteItem
@@ -17,15 +16,20 @@ Item {
 		}
 	}
 	onNoteIdChanged: {
-		// console.log('[todolist] onNoteIdChanged', noteId)
-		if (!noteItem.note || noteItem.note.id != noteId) {
-			noteItem.note = noteManager.loadNote(noteId, Plasmoid.id)
-		}
 		plasmoid.configuration.noteId = noteId
 	}
 
-	NotesWidget.NoteManager { id: noteManager }
-	property QtObject note: noteManager.loadNote(noteId, Plasmoid.id)
+	FileNote {
+		id: note
+		noteId: noteItem.noteId
+	}
+	// Pick up edits made by another instance or a text editor, unless a
+	// save of our own is still pending.
+	function reloadFromDisk() {
+		if (!deboucedSaveNoteTimer.running) {
+			note.reload()
+		}
+	}
 	property bool deserializeOnFileChange: true
 	property bool saveOnChange: true
 	property string noteText: ''
